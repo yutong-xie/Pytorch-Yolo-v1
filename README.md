@@ -1,2 +1,2 @@
-# Pytorch-Yolo-v1
+# YOLOv1 PyTorch
 Implementation of YOLO v1 in PyTorch 
