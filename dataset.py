@@ -1,15 +1,11 @@
 import os
 import random
-
 import cv2
 import numpy as np
-
 import torch
 import torch.utils.data as DataLoader
 import torchvision.transforms as transforms
-
 from config import VOC_IMG_MEAN
-
 
 class VocDetectorDataset(DataLoader.Dataset):
     image_size = 448
@@ -27,10 +23,12 @@ class VocDetectorDataset(DataLoader.Dataset):
         
         self.return_image_id = return_image_id
         self.encode_target = encode_target
-        
+
         with open(dataset_file) as f:
             lines = f.readlines()
 
+        # format of lines in the file: image_name, x1, y1, x2, y2, class ...
+        # i.e. 009016.jpg 184 3 334 452 4
         for line in lines:
             split_line = line.strip().split()
             self.fnames.append(split_line[0])
@@ -107,7 +105,7 @@ class VocDetectorDataset(DataLoader.Dataset):
             # confidence represents iou between predicted and ground truth
             target[int(ij[1]), int(ij[0]), 4] = 1  # confidence of box 1
             target[int(ij[1]), int(ij[0]), 9] = 1  # confidence of box 2
-            target[int(ij[1]), int(ij[0]), int(labels[i]) + 9] = 1
+            target[int(ij[1]), int(ij[0]), int(labels[i]) + 9] = 1 # class of the object
             xy = ij * cell_size  # coordinates of upper left corner
             delta_xy = (center_xy - xy) / cell_size
             target[int(ij[1]), int(ij[0]), 2:4] = wh[i]
