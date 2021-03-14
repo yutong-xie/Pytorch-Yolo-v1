@@ -120,10 +120,10 @@ class VocDetectorDataset(DataLoader.Dataset):
         if random.random() < 0.5:
             height, width, c = img.shape
             after_shfit_image = np.zeros((height, width, c), dtype=img.dtype)
+            # According to the dataset image mean
             after_shfit_image[:, :, :] = (104, 117, 123)  # bgr
             shift_x = random.uniform(-width * 0.2, width * 0.2)
             shift_y = random.uniform(-height * 0.2, height * 0.2)
-
             # translate image by a shift factor
             if shift_x >= 0 and shift_y >= 0:
                 after_shfit_image[int(shift_y):, int(shift_x):, :] = img[:height - int(shift_y), :width - int(shift_x), :]
@@ -132,15 +132,15 @@ class VocDetectorDataset(DataLoader.Dataset):
             elif shift_x < 0 and shift_y >= 0:
                 after_shfit_image[int(shift_y):, :width + int(shift_x), :] = img[:height - int(shift_y), -int(shift_x):, :]
             elif shift_x < 0 and shift_y < 0:
-                after_shfit_image[:height + int(shift_y), :width + int(shift_x), :] = img[-int(shift_y):,
-                                                                                      -int(shift_x):, :]
-
+                after_shfit_image[:height + int(shift_y), :width + int(shift_x), :] = img[-int(shift_y):, -int(shift_x):, :]
+            # translate the boxes
             shift_xy = torch.FloatTensor([[int(shift_x), int(shift_y)]]).expand_as(center)
             center = center + shift_xy
             mask1 = (center[:, 0] > 0) & (center[:, 0] < width)
             mask2 = (center[:, 1] > 0) & (center[:, 1] < height)
             mask = (mask1 & mask2).view(-1, 1)
             boxes_in = boxes[mask.expand_as(boxes)].view(-1, 4)
+            # if the boxes outside the boundary, do not do random shift.
             if len(boxes_in) == 0:
                 return img, boxes, labels
             box_shift = torch.FloatTensor([[int(shift_x), int(shift_y), int(shift_x), int(shift_y)]]).expand_as(
