@@ -104,7 +104,6 @@ class YoloLoss(nn.Module):
         Returns:
         no_object_loss : scalar
 
-        Hints:
         1) Create a 2 tensors no_object_prediction and no_object_target which only have the
         values which have no object.
         2) Have another tensor no_object_prediction_mask of the same size such that
@@ -140,7 +139,6 @@ class YoloLoss(nn.Module):
         box_target_iou: (tensor)
         contains_object_response_mask : (tensor)
 
-        Hints:
         1) Find the iou's of each of the 2 bounding boxes of each grid cell of each image.
         2) Set the corresponding contains_object_response_mask of the bounding box with the max iou
         of the 2 bounding boxes of each grid cell to 1.
@@ -223,7 +221,6 @@ class YoloLoss(nn.Module):
         contains_object_target = target_tensor[contains_object_mask.bool()].reshape(-1,30)
         bounding_box_target = contains_object_target[:, :10].reshape(-1, 5)
         classes_target = contains_object_target[:, 10:]
-
 
         # Compute the No object loss here
         no_object_loss = self.get_no_object_loss(target_tensor, pred_tensor, no_object_mask)
