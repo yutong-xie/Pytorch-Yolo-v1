@@ -43,8 +43,8 @@ def decoder(pred):
                     box = pred[i, j, b * 5:b * 5 + 4]
                     contain_prob = torch.FloatTensor([pred[i, j, b * 5 + 4]])
                     xy = torch.FloatTensor([j, i]) * cell_size  # upper left corner of grid cell
-                    box[:2] = box[:2] * cell_size + xy  # return cxcy relative to image
-                    box_xy = torch.FloatTensor(box.size())  # convert[cx,cy,w,h] to [x1,xy1,x2,y2]
+                    box[:2] = box[:2] * cell_size + xy  # return cx, cy relative to image
+                    box_xy = torch.FloatTensor(box.size())  # convert[cx,cy,w,h] to [x1,y1,x2,y2]
                     box_xy[:2] = box[:2] - 0.5 * box[2:]
                     box_xy[2:] = box[:2] + 0.5 * box[2:]
                     max_prob, cls_index = torch.max(pred[i, j, 10:], 0)
@@ -76,7 +76,8 @@ def nms(bboxes,scores,threshold=0.5):
     x2 = bboxes[:,2]
     y2 = bboxes[:,3]
     areas = (x2-x1) * (y2-y1)
-
+    
+    # sort function return sorted tensor and corresponding indices. 
     _,order = scores.sort(0,descending=True)
     keep = []
     while order.numel() > 0:
