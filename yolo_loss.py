@@ -53,7 +53,7 @@ class YoloLoss(nn.Module):
         Returns:
         class_loss : scalar
         """
-        # Measures the Binary Cross Entropy between the target and the output.
+        # Measures the Mean Square Error between the target and the output.
         class_loss = F.mse_loss(classes_pred,classes_target, reduction = 'sum')
 
         return class_loss
@@ -87,8 +87,6 @@ class YoloLoss(nn.Module):
         contain_loss : scalar
 
         """
-
-        
         pred = box_pred_response[:, 4]
         target = Variable(box_target_response_iou[:, 4].detach())
         # target = box_target_response_iou[:, 4]
@@ -114,8 +112,6 @@ class YoloLoss(nn.Module):
         3) Create 2 tensors which are extracted from no_object_prediction and no_object_target using
         the mask created above to find the loss.
         """
-
-        
         no_object_prediction = pred_tensor[no_object_mask.bool()].view((-1, 30))
         no_object_target = target_tensor[no_object_mask.bool()].view((-1, 30))
 
@@ -208,11 +204,6 @@ class YoloLoss(nn.Module):
         # Create 2 tensors contains_object_mask and no_object_mask
         # of size (Batch_size, S, S) such that each value corresponds to if the confidence of having
         # an object > 0 in the target tensor.
-
-        
-        # target_tensor = target_tensor.reshape((-1, 30))
-        # pred_tensor = pred_tensor.reshape((-1, 30))
-
         contains_object_mask = target_tensor[:,:,:,4]
         contains_object_mask = contains_object_mask.unsqueeze(-1).expand_as(target_tensor)
         no_object_mask = target_tensor[:,:,:,4] == 0
@@ -223,11 +214,6 @@ class YoloLoss(nn.Module):
         # Split this tensor into 2 tensors :
         # 1) bounding_box_pred : Contains all the Bounding box predictions of all grid cells of all images
         # 2) classes_pred : Contains all the class predictions for each grid cell of each image
-        # Hint : Use contains_object_mask
-
-        
-        # pred_tensor = pred_tensor.view((-1, 30))
-        # target_tensor = target_tensor.view((-1, 30))
         contains_object_pred = pred_tensor[contains_object_mask.bool()].reshape(-1,30)
         bounding_box_pred = contains_object_pred[:, :10].reshape(-1, 5)
         classes_pred = contains_object_pred[:, 10:]
@@ -250,7 +236,6 @@ class YoloLoss(nn.Module):
         # 1) box_prediction_response - bounding box predictions for each grid cell which has the maximum iou
         # 2) box_target_response_iou - bounding box target ious for each grid cell which has the maximum iou
         # 3) box_target_response -  bounding box targets for each grid cell which has the maximum iou
-        # Hint : Use contains_object_response_mask
         box_prediction_response = bounding_box_pred[coo_response_mask[:, 4].bool()].reshape(-1,5)
         box_target_response = bounding_box_target[coo_response_mask[:, 4].bool()].reshape(-1,5)
         box_target_response_iou = box_target_iou[box_target_iou[:, 4].bool()].reshape(-1,5)
