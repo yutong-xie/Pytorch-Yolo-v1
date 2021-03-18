@@ -53,10 +53,7 @@ class YoloLoss(nn.Module):
         Returns:
         class_loss : scalar
         """
-
-        ##### CODE #####
         # Measures the Binary Cross Entropy between the target and the output.
-
         class_loss = F.mse_loss(classes_pred,classes_target, reduction = 'sum')
 
         return class_loss
@@ -74,8 +71,6 @@ class YoloLoss(nn.Module):
         reg_loss : scalar
 
         """
-
-        ##### CODE #####
         # Calculate Mean square Error for x, y, sqrt(w), sqrt(h)
         loss_xy = F.mse_loss(box_pred_response[:, :2], box_target_response[:, :2], reduction = "sum")
         loss_wh = F.mse_loss(torch.sqrt(box_pred_response[:, 2:4]), torch.sqrt(box_target_response[:, 2:4]), reduction = "sum")
@@ -95,7 +90,7 @@ class YoloLoss(nn.Module):
 
         """
 
-        ##### CODE #####
+        
         pred = box_pred_response[:, 4]
         target = Variable(box_target_response_iou[:, 4].detach())
         # target = box_target_response_iou[:, 4]
@@ -122,7 +117,7 @@ class YoloLoss(nn.Module):
         the mask created above to find the loss.
         """
 
-        ##### CODE #####
+        
         no_object_prediction = pred_tensor[no_object_mask.bool()].view((-1, 30))
         no_object_target = target_tensor[no_object_mask.bool()].view((-1, 30))
 
@@ -166,7 +161,7 @@ class YoloLoss(nn.Module):
 
         """
 
-        ##### CODE #####
+        
 
         b1 = torch.zeros(box_pred.size())
         b2 = torch.zeros(box_target.size())
@@ -220,7 +215,7 @@ class YoloLoss(nn.Module):
         # of size (Batch_size, S, S) such that each value corresponds to if the confidence of having
         # an object > 0 in the target tensor.
 
-        ##### CODE #####
+        
         # target_tensor = target_tensor.reshape((-1, 30))
         # pred_tensor = pred_tensor.reshape((-1, 30))
 
@@ -237,7 +232,7 @@ class YoloLoss(nn.Module):
         # 2) classes_pred : Contains all the class predictions for each grid cell of each image
         # Hint : Use contains_object_mask
 
-        ##### CODE #####
+        
         # pred_tensor = pred_tensor.view((-1, 30))
         # target_tensor = target_tensor.view((-1, 30))
         contains_object_pred = pred_tensor[contains_object_mask.bool()].reshape(-1,30)
@@ -246,22 +241,16 @@ class YoloLoss(nn.Module):
 
         # Similarly as above create 2 tensors bounding_box_target and
         # classes_target.
-
-        ##### CODE #####
         contains_object_target = target_tensor[contains_object_mask.bool()].reshape(-1,30)
         bounding_box_target = contains_object_target[:, :10].reshape(-1, 5)
         classes_target = contains_object_target[:, 10:]
 
 
         # Compute the No object loss here
-
-        ##### CODE #####
         no_object_loss = self.get_no_object_loss(target_tensor, pred_tensor, no_object_mask)
 
         # Compute the iou's of all bounding boxes and the mask for which bounding box
         # of 2 has the maximum iou the bounding boxes for each grid cell of each image.
-
-        ##### CODE #####
         box_target_iou, coo_response_mask = self.find_best_iou_boxes(bounding_box_target, bounding_box_pred)
 
         # Create 3 tensors :
@@ -272,11 +261,8 @@ class YoloLoss(nn.Module):
         box_prediction_response = bounding_box_pred[coo_response_mask[:, 4].bool()].reshape(-1,5)
         box_target_response = bounding_box_target[coo_response_mask[:, 4].bool()].reshape(-1,5)
         box_target_response_iou = box_target_iou[box_target_iou[:, 4].bool()].reshape(-1,5)
-        ##### CODE #####
 
         # Find the class_loss, containing object loss and regression loss
-
-        ##### CODE #####
         class_loss = self.get_class_prediction_loss(classes_pred, classes_target)
         regression_loss = self.get_regression_loss(box_prediction_response, box_target_response)
         contain_object_loss = self.get_contain_conf_loss(box_prediction_response, box_target_response_iou)
