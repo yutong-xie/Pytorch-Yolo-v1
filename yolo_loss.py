@@ -65,7 +65,6 @@ class YoloLoss(nn.Module):
         box_pred_response : (tensor) size (-1, 5)
         box_target_response : (tensor) size (-1, 5)
         Note : -1 corresponds to ravels the tensor into the dimension specified
-        See : https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view_as
 
         Returns:
         reg_loss : scalar
@@ -83,7 +82,6 @@ class YoloLoss(nn.Module):
         box_pred_response : (tensor) size ( -1 , 5)
         box_target_response_iou : (tensor) size ( -1 , 5)
         Note : -1 corresponds to ravels the tensor into the dimension specified
-        See : https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view_as
 
         Returns:
         contain_loss : scalar
@@ -141,7 +139,6 @@ class YoloLoss(nn.Module):
         box_target : (tensor)  size (-1, 5)
         box_pred : (tensor) size (-1, 5)
         Note : -1 corresponds to ravels the tensor into the dimension specified
-        See : https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view_as
 
         Returns:
         box_target_iou: (tensor)
@@ -160,9 +157,6 @@ class YoloLoss(nn.Module):
         5) Set the confidence of the box_target_iou of the bounding box to the maximum iou
 
         """
-
-        
-
         b1 = torch.zeros(box_pred.size())
         b2 = torch.zeros(box_target.size())
 
@@ -223,7 +217,6 @@ class YoloLoss(nn.Module):
         contains_object_mask = contains_object_mask.unsqueeze(-1).expand_as(target_tensor)
         no_object_mask = target_tensor[:,:,:,4] == 0
         no_object_mask = no_object_mask.unsqueeze(-1).expand_as(target_tensor)
-
 
         # Create a tensor contains_object_pred that corresponds to
         # to all the predictions which seem to confidence > 0 for having an object
